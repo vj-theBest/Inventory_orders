@@ -1,4 +1,4 @@
-const InventoryItem = require('../../models/inventoryItem');
+const InventoryItem = require('./inventoryItem');
 
 // Controller functions
 exports.createItem = async (req, res) => {
@@ -23,7 +23,7 @@ exports.getAllItems = async (req, res) => {
 
 exports.getItemById = async (req, res) => {
   try {
-    const item = await InventoryItem.findById(req.params.itemId);
+    const item = await InventoryItem.findById(req.query.id);
     if (item == null) {
       return res.status(404).json({ message: 'Item not found' });
     }
@@ -36,7 +36,7 @@ exports.getItemById = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     const { name, quantity } = req.body;
-    await InventoryItem.findByIdAndUpdate(req.params.itemId, { name, quantity });
+    await InventoryItem.findByIdAndUpdate(req.query.id, { name, quantity });
     res.json({ message: 'Item updated successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -45,7 +45,11 @@ exports.updateItem = async (req, res) => {
 
 exports.deleteItem = async (req, res) => {
   try {
-    await InventoryItem.findByIdAndDelete(req.params.itemId);
+    const item = await InventoryItem.findById(req.query.id);
+    if (item == null) {
+      return res.status(404).json({ message: 'Item not found' });
+    }
+    await InventoryItem.findByIdAndDelete(req.query.id);
     res.json({ message: 'Item deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
